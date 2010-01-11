@@ -15,6 +15,8 @@ from fixed_offset import FixedOffset
 __all__ = ['IMAPClient', 'DELETED', 'SEEN', 'ANSWERED', 'FLAGGED', 'DRAFT',
     'RECENT']
 
+from response_parser import parse_fetch_response
+
 # System flags
 DELETED = r'\Deleted'
 SEEN = r'\Seen'
@@ -326,6 +328,8 @@ class IMAPClient(object):
             typ, data = self._imap.search(charset, *crit_list)
 
         self._checkok('search', typ, data)
+        if data == [None]: # no untagged responses...
+            return []
 
         return [ long(i) for i in data[0].split() ]
 
@@ -435,6 +439,26 @@ class IMAPClient(object):
         parser = FetchParser()
         return parser(data)
 
+    def altfetch(self, messages, parts):
+        if not messages:
+            return {}
+
+        msg_list = messages_to_str(messages)
+        parts_list = seq_to_parenlist([p.upper() for p in parts])
+
+        if self.use_uid:
+            tag = self._imap._command('UID', 'FETCH', msg_list, parts_list)
+        else:
+            tag = self._imap._command('FETCH', msg_list, parts_list)
+        typ, data = self._imap._command_complete('FETCH', tag)
+        self._checkok('fetch', typ, data)
+        typ, data = self._imap._untagged_response(typ, data, 'FETCH')
+        # appears to be a special case - no 'untagged' responses (ie, no
+        # folders) results in [None]
+        if data == [None]:
+          return {}
+
+        return parse_fetch_response(data)
 
     def append(self, folder, msg, flags=(), msg_time=None):
         """Append a message to a folder
@@ -799,7 +823,6 @@ def datetime_to_imap(dt):
     """
     if not dt.tzinfo:
         dt = dt.replace(tzinfo=FixedOffset.for_system())
-
     return dt.strftime("%d-%b-%Y %H:%M:%S %z")
-    
+
 
