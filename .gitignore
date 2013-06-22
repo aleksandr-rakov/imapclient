@@ -40,3 +40,4 @@ nosetests.xml
 local
 include
 share
+*.tar.gz
