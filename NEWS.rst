@@ -1,10 +1,27 @@
+========
+ 0.10.2
+========
+Switch back to setuptools now that distribute and setuptools have
+merged back. Some users were reporting problems with distribute and
+the newer versions of setuptools.
+
+========
+ 0.10.1
+========
+
+Fixed regressions in several cases when binary data (i.e. normal
+strings under Python 2) are used as arguments to some methods. Also
+refactored input normalisation functions somewhat.
+
+Fixed buggy method for extracting flags and Gmail labels from STORE
+responses.
+
 ======
  0.10
 ======
 
 Python 3 support (#22) [API CHANGE]
 -----------------------------------
-
 Python 3.2 and 3.3 are now officially supported. This release also
 means that Python versions older than 2.6 are no longer supported.
 
@@ -22,14 +39,15 @@ that there will be a problem. Please test your existing applications
 thoroughly with this verison of IMAPClient before deploying to
 production situations.
 
-Minor Features
---------------
+Minor Changes
+-------------
 * "python setup.py test" now runs the unit tests
+* Mock library is now longer included (listed as external test dependency)
 * live tests that aren't UID related are now only run once
 * live tests now perform far less logins to the server under test
 * Unit tests can now be run for all supported Python versions using ``tox``.
-* Much improved documentation regarding working on the project.
-* Various documentation clarifications.
+* Improved documentation regarding working on the project.
+* Many documentation fixes and improvements.
 
 Minor Bug Fixes
 ---------------
