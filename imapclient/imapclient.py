@@ -41,7 +41,7 @@ if 'XLIST' not in imaplib.Commands:
 if 'IDLE' not in imaplib.Commands:
   imaplib.Commands['IDLE'] = imaplib.Commands['APPEND']
 
-# ...and MOVE
+# ...and RFC6851 MOVE
 if 'MOVE' not in imaplib.Commands:
   imaplib.Commands['MOVE'] = imaplib.Commands['COPY']
 
@@ -820,10 +820,15 @@ class IMAPClient(object):
                                        uid=True, unpack=True)
 
     def move(self, messages, folder):
-        return self._command_and_check('move',
-                                       messages_to_str(messages),
-                                       self._normalise_folder(folder),
-                                       uid=True, unpack=True)
+        if 'MOVE' in self.capabilities:
+            return self._command_and_check('move',
+                                          messages_to_str(messages),
+                                          self._normalise_folder(folder),
+                                          uid=True, unpack=True)
+        elif 'UIDPLUS' in self.capabilities:
+            raise self.Error("Unimplemented")
+        else:
+            raise self.Error("Can't robustly MOVE messages without server-side MOVE or UIDPLUS support")
 
     def expunge(self):
         """Remove any messages from the currently selected folder that
