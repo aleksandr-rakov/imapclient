@@ -41,6 +41,10 @@ if 'XLIST' not in imaplib.Commands:
 if 'IDLE' not in imaplib.Commands:
   imaplib.Commands['IDLE'] = imaplib.Commands['APPEND']
 
+# ...and MOVE
+if 'MOVE' not in imaplib.Commands:
+  imaplib.Commands['MOVE'] = imaplib.Commands['COPY']
+
 
 # System flags
 DELETED = r'\Deleted'
@@ -811,6 +815,12 @@ class IMAPClient(object):
         server.
         """
         return self._command_and_check('copy',
+                                       messages_to_str(messages),
+                                       self._normalise_folder(folder),
+                                       uid=True, unpack=True)
+
+    def move(self, messages, folder):
+        return self._command_and_check('move',
                                        messages_to_str(messages),
                                        self._normalise_folder(folder),
                                        uid=True, unpack=True)
