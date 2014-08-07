@@ -600,6 +600,7 @@ class IMAPClient(object):
 
         self._checkok('search', typ, data)
         data = data[0]
+        data = data.split("(MODSEQ")[0]
         if data is None:    # no untagged responses...
             return []
         return [long(i) for i in data.split()]
