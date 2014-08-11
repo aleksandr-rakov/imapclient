@@ -1064,5 +1064,6 @@ def from_bytes(data):
     elif isinstance(data, tuple):
         return tuple([from_bytes(item) for item in data])
     elif isinstance(data, binary_type):
-        return data.decode('latin-1')
+        return data #fix lost cyrilic encoding
+        #return data.decode('latin-1')
     return data
